@@ -1,0 +1,33 @@
+# Node modules
+backend/node_modules/
+frontend/node_modules/
+
+# Environment files
+backend/.env
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency locks
+backend/package-lock.json
+frontend/package-lock.json
+
+# Build outputs
+frontend/public/
+frontend/dist/
+
+# Editor and OS-specific files
+.DS_Store
+Thumbs.db
+*.swp
+*.bak
+*.tmp
+*.~*
+
+# IDE and tools
+.vscode/
+.idea/
+*.iml
