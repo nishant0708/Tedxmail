@@ -1,6 +1,7 @@
 const UnverifiedUser = require("../models/unverifieduser");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
 const jwt = require('jsonwebtoken');
 const { sendOtpToEmail } = require("../Config/nodemailer");
 
@@ -119,8 +120,8 @@ const verifyUser = async (req, res) => {
         return res.status(400).json({ error: "Email and password are required" });
       }
   
-      // Fetch user from the database (replace with your DB query)
-      const user = await User.findOne({ email }); // Example: Using Mongoose
+      // Fetch user from the database
+      const user = await User.findOne({ email });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -138,13 +139,25 @@ const verifyUser = async (req, res) => {
           email: user.email,
         },
         JWT_SECRET,
-        { expiresIn: "6h" } 
+        { expiresIn: "6h" }
       );
   
-      // Send token and user details to the client
+      // Generate session ID and set expiry to 6 hours from now
+      const sessionId = crypto.randomBytes(16).toString("hex");
+      const expiresAt = new Date(Date.now() + 6 * 60 * 60 * 1000); // 6 hours from now
+  
+      // Save session to user's sessions array
+      if (!user.sessions) {
+        user.sessions = [];
+      }
+      user.sessions.push({ sessionId, expiresAt });
+      await user.save();
+  
+      // Send token, session ID, and user details to the client
       res.status(200).json({
         message: "Login successful",
         token,
+        sessionId,
         user: {
           id: user._id,
           email: user.email,
