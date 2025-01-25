@@ -1,10 +1,9 @@
 import React, { memo } from 'react';
-
+import SignUp from '../signup/SignUp';
 const Home = memo(() => {
     return (
-        <div>
-            <h1 className="text-3xl font-bold underline">
-            Hello World!</h1>
+        <div className='relative bg-black h-screen'>
+            <SignUp></SignUp>
         </div>
     );
 });

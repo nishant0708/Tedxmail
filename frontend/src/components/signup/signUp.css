@@ -1,0 +1,9 @@
+.name::placeholder {
+    transition: all 0.3s ease;
+  }
+
+.name:focus::placeholder {
+    transform: translateY(-20px);
+    font-size: 0.8rem;
+    color: #EE2922; 
+  }
