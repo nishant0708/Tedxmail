@@ -8,6 +8,12 @@ const unverifieduser = new mongoose.Schema(
     mobileNumber: { type: String, required: true },
     otp: { type: String },
     otpExpiry: { type: Date },
+    sessions: [
+      {
+        sessionId: { type: String },
+        expiresAt: { type: Date },
+      },
+    ],
     isVerified: { type: Boolean, default: false }, // Add field to check verification status
     role: { type: String, enum: ["user", "admin"], default: "user" }, // Add field for roles
   },
