@@ -30,7 +30,6 @@ const SignUp = () => {
   const onSignUpSubmit = async (data) => {
     try {
       const { password, email, name, mobileNumber } = data;
-      console.log(data);
       
       const response = await axios.post("http://localhost:5000/api/signup", {
         name,
