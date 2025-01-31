@@ -3,7 +3,7 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const jwt = require('jsonwebtoken');
-const { sendOtpToEmail } = require("../Config/nodemailer");
+const { sendOtpToEmail, sendEmail } = require("../Config/nodemailer");
 
 // Sign-Up Function
 const signUp = async (req, res) => {
@@ -169,9 +169,34 @@ const verifyUser = async (req, res) => {
       res.status(500).json({ error: "Internal server error" });
     }
   };
+
+  const sendMailController = async (req, res) => {
+    
+    const { email, cc, subject, content } = req.body;
+
+    try {
+
+      if (!email || !subject || !content) {
+        return res.status(400).json({ error: "Email, subject, and content are required" });
+      }
+  
+      const ccArray = cc ? (Array.isArray(cc) ? cc : [cc]) : [];
+      
+      await sendEmail(email, ccArray, subject, content);
+      
+      res.status(200).json({ 
+        success: true,
+        message: "Email sent successfully" });
+    } catch (error) {
+      console.log("error in sending mail:", error.message);
+      res.status(500).json({ message: error.message });
+    }
+  };
+  
   
 module.exports = {
   signUp,
   verifyUser,
   login,
+  sendMailController
 };
