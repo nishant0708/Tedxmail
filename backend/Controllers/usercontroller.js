@@ -171,27 +171,32 @@ const verifyUser = async (req, res) => {
   };
 
   const sendMailController = async (req, res) => {
+    console.log("🚀 Request Headers:", req.headers);
+    console.log("🚀 Request Body:", req.body); 
+    const file = req.file || null;
+    console.log("🚀 Request File:", file); 
     
     const { email, cc, subject, content } = req.body;
 
     try {
+        if (!email || !subject || !content) {
+            return res.status(400).json({ error: "Email, subject, and content are required" });
+        }
 
-      if (!email || !subject || !content) {
-        return res.status(400).json({ error: "Email, subject, and content are required" });
-      }
-  
-      const ccArray = cc ? (Array.isArray(cc) ? cc : [cc]) : [];
-      
-      await sendEmail(email, ccArray, subject, content);
-      
-      res.status(200).json({ 
-        success: true,
-        message: "Email sent successfully" });
+        const ccArray = cc ? (Array.isArray(cc) ? cc : [cc]) : [];
+        
+        // Assuming sendEmail is a function that sends the email
+        await sendEmail(email, ccArray, subject, content, file);
+        
+        res.status(200).json({ 
+            success: true,
+            message: "Email sent successfully" 
+        });
     } catch (error) {
-      console.log("error in sending mail:", error.message);
-      res.status(500).json({ message: error.message });
+        console.log("Error in sending mail:", error.message);
+        res.status(500).json({ message: error.message });
     }
-  };
+};
   
   
 module.exports = {
