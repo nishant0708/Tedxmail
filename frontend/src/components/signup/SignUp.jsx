@@ -69,7 +69,7 @@ const SignUp = () => {
     try {
       const response = await axios.post("http://localhost:5000/api/login", { email, password });
       console.log(response.data.message)
-      navigate("/dashboard");
+      navigate("/sending-mail");
     } catch (error) {
       console.log("Error while login");
     }
