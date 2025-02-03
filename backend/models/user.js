@@ -14,6 +14,16 @@ const User = new mongoose.Schema(
         expiresAt: { type: Date }, // Expiry time for the session
       },
     ],
+    sessions: [{
+      sessionId: {
+        type: String,
+        required: true
+      },
+      expiresAt: {
+        type: Date,
+        required: true
+      }
+    }],
     resetPasswordToken: { type: String }, // Field for storing the hashed reset token
     resetPasswordExpiry: { type: Date }, // Field for storing the token expiry time
   },
