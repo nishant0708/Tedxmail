@@ -24,13 +24,13 @@ const SignUp = () => {
     handleSubmit,
     reset,
     watch,
-    formState: { errors, isSubmitting},
+    formState: { errors, isSubmitting },
   } = useForm();
   const password = watch("password");
   const onSignUpSubmit = async (data) => {
     try {
       const { password, email, name, mobileNumber } = data;
-      
+
       const response = await axios.post("http://localhost:5000/api/signup", {
         name,
         email,
@@ -42,7 +42,7 @@ const SignUp = () => {
       localStorage.setItem("isOtp", JSON.stringify(true));
       localStorage.setItem("email", email);
       reset();
-      console.log(response.data.message)
+      console.log(response.data.message);
     } catch (error) {
       console.log("error while submitting", error);
     }
@@ -50,16 +50,19 @@ const SignUp = () => {
   const onOtpSubmit = async (data) => {
     const { otp } = data;
     try {
-      const response = await axios.post("http://localhost:5000/api/verifypasscode", {
-        email: storedEmail,
-        otp,
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/verifypasscode",
+        {
+          email: storedEmail,
+          otp,
+        }
+      );
       setIsOtp(false);
       localStorage.removeItem("isOtp");
       localStorage.removeItem("email");
       reset();
       setIsActive(false);
-      console.log(response.data.message)
+      console.log(response.data.message);
     } catch (error) {
       console.log("Error while verification", error);
     }
@@ -67,8 +70,11 @@ const SignUp = () => {
   const onLoginSubmit = async (data) => {
     const { email, password } = data;
     try {
-      const response = await axios.post("http://localhost:5000/api/login", { email, password });
-      console.log(response.data.message)
+      const response = await axios.post("http://localhost:5000/api/login", {
+        email,
+        password,
+      });
+      console.log(response.data.message);
       navigate("/sending-mail");
     } catch (error) {
       console.log("Error while login");
@@ -132,9 +138,11 @@ const SignUp = () => {
       }
     );
   }, [isActive]);
+  
 
   return (
     <section className="xl:h-screen w-full bg-black flex">
+    
       <div className="xl:h-screen xl:w-24 h-screen w-7 bg-[#EE2922] flex justify-center items-end relative">
         <img
           src={leftImage}
@@ -162,8 +170,9 @@ const SignUp = () => {
           <div className="h-[230px] w-full lg:w-[400px] border mt-10 xl:mt-0 rounded-lg shadow-md px-3">
             <form
               className="mt-4"
+              autoComplete="off"
               ref={inputRef}
-              onSubmit={handleSubmit(onOtpSubmit)}
+              onSubmit={handleSubmit(onOtpSubmit)} 
             >
               <div className="mb-4">
                 <input
@@ -171,7 +180,7 @@ const SignUp = () => {
                   className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-6 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
                   placeholder="Email"
                   {...register("email")}
-                  onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
+                  onFocus={(e) => e.target.setAttribute("autocomplete", "off")}
                 />
               </div>
               <div className="mb-4">
@@ -220,13 +229,13 @@ const SignUp = () => {
               <form ref={inputRef} onSubmit={handleSubmit(onSignUpSubmit)}>
                 {/* Sign Up Form */}
                 <div className="mb-3">
-                  <input
-                    type="text"
-                    className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-8 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
-                    placeholder="Name"
-                    {...register("name", { required: "Name is required" })}
-                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
-                  />
+                <input
+    type="text"
+    className="w-full border-0 border-b-2 border-gray-400 bg-black text-white pt-8 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
+    placeholder="Name"
+    autoComplete="off"
+    {...register("name", { required: "Name is required" })}
+  />
                 </div>
                 <div className="mb-3">
                   <input
@@ -240,18 +249,22 @@ const SignUp = () => {
                           /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
                       },
                     })}
-                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
+                    onFocus={(e) =>
+                      e.target.setAttribute("autocomplete", "off")
+                    }
                   />
                 </div>
                 <div className="mb-3">
                   <input
                     type="text"
-                    className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-8 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
+                    className="peer w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-8 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0 autofill:bg-transparent autofill:text-white"
                     placeholder="Phone No."
                     {...register("mobileNumber", {
                       required: "Phone number is required",
                     })}
-                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
+                    onFocus={(e) =>
+                      e.target.setAttribute("autocomplete", "off")
+                    }
                   />
                 </div>
                 <div className="mb-3">
@@ -265,7 +278,9 @@ const SignUp = () => {
                         value: 6,
                       },
                     })}
-                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
+                    onFocus={(e) =>
+                      e.target.setAttribute("autocomplete", "off")
+                    }
                   />
                 </div>
                 <div className="mb-4">
@@ -278,7 +293,9 @@ const SignUp = () => {
                       validate: (value) =>
                         value === password || "Passwords do not match",
                     })}
-                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
+                    onFocus={(e) =>
+                      e.target.setAttribute("autocomplete", "off")
+                    }
                   />
                   {errors.confirmPassword && (
                     <p className="text-red-500 text-sm">
@@ -294,9 +311,14 @@ const SignUp = () => {
                   SIGN UP
                 </button>
                 <div className="text-white font-light text-center text-[14px] mt-3">
-                  <button className="underline" onClick={()=>{
-                    setIsOtp(true)
-                    }}>Have a passcode?</button>
+                  <button
+                    className="underline"
+                    onClick={() => {
+                      setIsOtp(true);
+                    }}
+                  >
+                    Have a passcode?
+                  </button>
                 </div>
               </form>
             ) : (
@@ -311,7 +333,9 @@ const SignUp = () => {
                     className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-6 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
                     placeholder="Email"
                     {...register("email")}
-                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
+                    onFocus={(e) =>
+                      e.target.setAttribute("autocomplete", "off")
+                    }
                   />
                 </div>
                 <div className="mb-4">
