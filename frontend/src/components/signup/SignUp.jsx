@@ -171,7 +171,7 @@ const SignUp = () => {
                   className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-6 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
                   placeholder="Email"
                   {...register("email")}
-                  autoComplete="off"
+                  onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
                 />
               </div>
               <div className="mb-4">
@@ -225,7 +225,7 @@ const SignUp = () => {
                     className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-8 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
                     placeholder="Name"
                     {...register("name", { required: "Name is required" })}
-                    autoComplete="off"
+                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
                   />
                 </div>
                 <div className="mb-3">
@@ -240,7 +240,7 @@ const SignUp = () => {
                           /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
                       },
                     })}
-                    autoComplete="off"
+                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
                   />
                 </div>
                 <div className="mb-3">
@@ -251,7 +251,7 @@ const SignUp = () => {
                     {...register("mobileNumber", {
                       required: "Phone number is required",
                     })}
-                    autoComplete="off"
+                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
                   />
                 </div>
                 <div className="mb-3">
@@ -265,7 +265,7 @@ const SignUp = () => {
                         value: 6,
                       },
                     })}
-                    autoComplete="off"
+                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
                   />
                 </div>
                 <div className="mb-4">
@@ -278,7 +278,7 @@ const SignUp = () => {
                       validate: (value) =>
                         value === password || "Passwords do not match",
                     })}
-                    autoComplete="off"
+                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
                   />
                   {errors.confirmPassword && (
                     <p className="text-red-500 text-sm">
@@ -311,7 +311,7 @@ const SignUp = () => {
                     className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-6 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
                     placeholder="Email"
                     {...register("email")}
-                    autoComplete="off"
+                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
                   />
                 </div>
                 <div className="mb-4">

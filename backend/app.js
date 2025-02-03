@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors"); // Import cors
 const auth = require("./Routes/auth");
+const uploadRoutes = require('./Routes/uploadRoutes');
 // const userRoutes = require('./routes/userRoutes');
 dotenv.config();
 // require('dotenv').config();
@@ -21,6 +22,7 @@ mongoose.connect( uri, { useNewUrlParser: true, useUnifiedTopology: true })
 
 // Routes
 app.use("/api", auth);
+app.use("/api", uploadRoutes);
 // app.use('/api/users', userRoutes)
 
 // Server
