@@ -72,11 +72,14 @@ const Mail = memo(() => {
     formData.append("subject", subject);
     formData.append("content", injectedHtml);
     formData.append("cc", emails.join(","));
-    if (file) formData.append("name", file); // Ensure this matches the server-side field name
+    if (file) formData.append('file', file); // Ensure this matches the server-side field name
 
     try {
-        const response = await axios.post("http://localhost:4000/api/send-email", formData, {
-            headers: { "Content-Type": "multipart/form-data" },
+        console.log("sending this frontend" , injectedHtml);
+        const response = await axios.post("http://localhost:4000/api/sending-mail", formData,{
+          headers: {
+            "Content-Type": "multipart/form-data"
+          }
         });
 
         if (response.status === 200) {
@@ -176,7 +179,10 @@ const Mail = memo(() => {
       </div>
 
       {/* Content Section */}
-      <div className="relative flex flex-col items-start px-6 py-8 md:px-10 w-full">
+
+      <div className="relative flex flex-col lg:flex-row items-start px-6 py-8 md:px-10 w-full">
+
+      <div className="relative flex flex-col items- h-[90vh] w-full overflow-y-scroll">
         {/* Logo Section */}
         <div className="flex items-center">
           <img src={Logo} alt="TEDx DAVV Logo" className="w-24 md:w-36 h-auto" />
@@ -248,37 +254,17 @@ const Mail = memo(() => {
 
           {/* Message Section */}
           <div className="mt-4">
-          <div className="bg-black rounded-[13px] p-4 w-full max-w-[500px] border border-white">
-            <ReactQuill
-              value={editorContent}
-              onChange={setEditorContent}
-              placeholder="Write your message..."
-              modules={{ toolbar: toolbarOptions }}
-              theme="snow"
-              className="bg-black text-white"
-            />
+            <div className="bg-black rounded-[13px] p-4 w-full max-w-[500px] border border-white">
+              <ReactQuill
+                value={editorContent}
+                onChange={setEditorContent}
+                placeholder="Write your message..."
+                modules={{ toolbar: toolbarOptions }}
+                theme="snow"
+                className="bg-black text-white"
+              />
 
-          <div
-              // dangerouslySetInnerHTML={{ __html: editorContent }}
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(injectedHtml) }}
-              style={{
-                position: "absolute",
-                right: "5vw",
-                top: "6vh",
-                border: "1px solid #ccc",
-                padding: "15px",
-                width: "35vw",
-                backgroundColor: "white",
-                height: "86vh",
-                overflowY: "auto", // Enables vertical scrolling
-                overflowX: "hidden", // Prevents horizontal scrolling
-                outline: "none", // Removes outline on focus
-                zIndex: '20'
-              }}
-              tabIndex="0" // Enables keyboard scrolling
-              onFocus={(e) => e.target.focus()} // Ensures it remains focusable
-            />
-
+          
             <style jsx>{`
               .ql-toolbar {
                 background-color: #000;
@@ -291,7 +277,7 @@ const Mail = memo(() => {
                 color: white;
                 border: none;
                 border-radius: 0 0 13px 13px;
-                max-height: 100px;
+                max-height: 80vh;
                 overflow-y: auto;
               }
               .ql-toolbar button {
@@ -318,6 +304,7 @@ const Mail = memo(() => {
                 className="w-[300px] p-2 border-dashed border-2 border-white text-white text-center cursor-pointer rounded-lg"
                 onDrop={handleFileDrop}
                 onDragOver={(e) => e.preventDefault()}
+                name="dropFile"
               >
                 {file ? (
                   <p className="truncate">{file.name}</p>
@@ -328,7 +315,7 @@ const Mail = memo(() => {
               <span className="text-white">or</span>
               <label className="text-white underline cursor-pointer">
                 <input
-                  name="name"
+                  name="file"
                   type="file"
                   onChange={handleFileChange}
                   className="hidden"
@@ -346,6 +333,27 @@ const Mail = memo(() => {
           </div>
         </div>
       </div>
+
+        <div  dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(injectedHtml) }}
+              style={{
+                position: "relative",
+                // right: "5vw",
+                // top: "6vh",
+                border: "1px solid #ccc",
+                padding: "5px",
+                width: "100%",
+                // backgroundColor: "white",
+                height: "100%",
+                overflowY: "auto", // Enables vertical scrolling
+                overflowX: "hidden", // Prevents horizontal scrolling
+                outline: "none", // Removes outline on focus
+                zIndex: '20'
+              }}
+              tabIndex="0" // Enables keyboard scrolling
+              onFocus={(e) => e.target.focus()} // Ensures it remains focusable
+            />
+          </div>
+      
 
       {/* Right Section Rectangular Box */}
       {/* <div
