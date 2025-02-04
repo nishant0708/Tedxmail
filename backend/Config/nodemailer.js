@@ -1,5 +1,6 @@
 require("dotenv").config();
 const nodemailer = require("nodemailer");
+const fetch = require("node-fetch");
 
 // Create a Nodemailer transporter using SMTP
 const transporter = nodemailer.createTransport({
@@ -7,8 +8,8 @@ const transporter = nodemailer.createTransport({
   port: 587, // Use 465 for secure SSL, 587 for TLS
   secure: false, // false for TLS (port 587), true for SSL (port 465)
   auth: {
-    user: process.env.MAIL_USER, // Email address
-    pass: process.env.MAIL_PASS, // App Password (not normal password)
+    user: process.env.EMAIL_USER, // Email address
+    pass: process.env.EMAIL_PASS, // App Password (not normal password)
   },
 });
 
@@ -16,8 +17,8 @@ const transporter = nodemailer.createTransport({
 exports.sendOtpToEmail = async (email, otp, text) => {
   try {
     await transporter.sendMail({
-      from: process.env.MAIL_USER,
-      to: process.env.MAIL_USER,
+      from: process.env.EMAIL_USER,
+      to: process.env.EMAIL_USER,
       subject: "Your OTP Code",
       text: text || `Your OTP code is ${otp}`, // Use the provided text or a default message
     });
@@ -32,32 +33,49 @@ exports.sendOtpToEmail = async (email, otp, text) => {
 // Function to send mail
 
 
-exports.sendEmail = async (email, ccArray, subject, content, file) => {
+exports.sendEmail = async (items) => {
   try {
-    // Log file properties for debugging (be cautious with sensitive data)
-    console.log("File properties:", {
-      originalname: file?.originalname,
-      buffer: file?.buffer ? file.buffer.toString('base64') : null, // Convert buffer to base64 for logging
-    });
+    console.log("sendEmail() called with:", items);
 
-    const attachments = file ? [{
-      filename: file.originalname,
-      content: file.buffer,
-    }] : [];
+    const { email, ccArray, subject, content, file } = items;
 
-    const info = await transporter.sendMail({
-      from: process.env.MAIL_USER,
+    if (!email) {
+      throw new Error("No recipient email provided");
+    }
+
+    // Fetch and attach files as buffers
+    const attachments = await Promise.all(
+      file.map(async (f) => {
+        const response = await fetch(f.path);
+        const buffer = await response.buffer();
+        return {
+          filename: f.originalname,
+          content: buffer,
+          encoding: "base64",
+        };
+      })
+    );
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
       to: email,
       cc: ccArray,
-      subject: subject,
-      html: content,
-      attachments: attachments,
-    });
+      subject: subject || "No Subject",
+      html: content || "",
+      attachments,
+    };
 
-    console.log("Mail sent successfully", info.response);
-    return info; // Optionally return the info object
+    console.log("✉️ Mail Options:", mailOptions);
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Mail sent successfully:", info.response);
+    return info;
   } catch (error) {
-    console.error("Error sending email:", error);
-    throw new Error(`Failed to send email to ${email} with subject "${subject}": ${error.message}`);
+    console.error("❌ Error sending email:", error);
+    throw new Error(`Failed to send email: ${error.message}`);
   }
 };
+
+
+
+

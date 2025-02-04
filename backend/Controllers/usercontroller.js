@@ -171,32 +171,55 @@ const verifyUser = async (req, res) => {
   };
 
   const sendMailController = async (req, res) => {
-    console.log("🚀 Request Headers:", req.headers);
-    console.log("🚀 Request Body:", req.body); 
-    const file = req.file || null;
-    console.log("🚀 Request File:", file); 
-    
-    const { email, cc, subject, content } = req.body;
-
     try {
-        if (!email || !subject || !content) {
-            return res.status(400).json({ error: "Email, subject, and content are required" });
+      console.log("🚀 Inside sendMailController");
+      console.log("📩 req.body:", req.body);
+      console.log("📂 req.files:", req.files);
+  
+      // Ensure correct extraction from req.body
+      const email = req.body.email;
+      const subject = req.body.subject;
+      const content = req.body.content;
+  
+      // Ensure ccArray is parsed correctly (it may be a string)
+      let ccArray = req.body.ccArray;
+      if (typeof ccArray === "string") {
+        try {
+          ccArray = JSON.parse(ccArray);
+        } catch (error) {
+          console.error("⚠️ Error parsing ccArray:", error);
+          ccArray = [];
         }
-
-        const ccArray = cc ? (Array.isArray(cc) ? cc : [cc]) : [];
-        
-        // Assuming sendEmail is a function that sends the email
-        await sendEmail(email, ccArray, subject, content, file);
-        
-        res.status(200).json({ 
-            success: true,
-            message: "Email sent successfully" 
-        });
+      }
+  
+      // Ensure req.files exists and file data is extracted properly
+      const file = req.files?.file || [];
+  
+      console.log("✅ Extracted Data:");
+      console.log("📩 Email:", email);
+      console.log("📩 CC:", ccArray);
+      console.log("📩 Subject:", subject);
+      console.log("📩 Content:", content);
+      console.log("📂 File:", file);
+  
+      // Check if email exists before proceeding
+      if (!email) {
+        return res.status(400).json({ success: false, message: "Recipient email is required" });
+      }
+  
+      // Call sendEmail function with correctly extracted data
+      const response = await sendEmail({ email, ccArray, subject, content, file });
+  
+      return res.status(200).json({ success: true, message: "Email sent successfully", response });
     } catch (error) {
-        console.log("Error in sending mail:", error.message);
-        res.status(500).json({ message: error.message });
+      console.error("❌ Error in sendMailController:", error);
+      return res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
     }
-};
+  };
+  
+  
+  
+  
   
   
 module.exports = {

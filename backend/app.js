@@ -17,15 +17,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Multer for file uploads
-const storage = multer.memoryStorage(); // Store files in memory buffer
-const upload = multer({ storage: storage }); // Initialize multer
-
-app.use(upload.none()); // This will allow parsing of multipart/form-data requests with no files
 
 
 // MongoDB Connection
-const uri = process.env.MONGO_URI;
+const uri = process.env.MONGO_URL;
 mongoose.connect( uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("Connected to MongoDB"))
   .catch((err) => console.error("Error connecting to MongoDB:", err));
