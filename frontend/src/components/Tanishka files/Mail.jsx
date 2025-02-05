@@ -194,7 +194,7 @@ const Mail = memo(() => {
                 onChange={handleEmailChange}
                 type="email"
                 placeholder="xyz@gmail.com"
-                className={`w-full sm:w-[400px] p-1 bg-transparent border ${
+                className={`p-[6px] w-full sm:w-[400px] p-1 bg-transparent border ${
                   toEmailError ? "border-red-500" : "border-white"
                 } text-white placeholder-white placeholder-opacity-50 rounded-[10px] focus:outline-none text-xs sm:text-base`}
               />
@@ -212,7 +212,7 @@ const Mail = memo(() => {
               onChange={handleSubjectChange}
               type="text"
               placeholder="Email Subject"
-              className="w-full sm:w-[400px] p-1 bg-transparent border border-white text-white placeholder-white placeholder-opacity-50 rounded-[10px] focus:outline-none text-xs sm:text-base"
+              className="w-full p-[6px] sm:w-[400px] p-1 bg-transparent border border-white text-white placeholder-white placeholder-opacity-50 rounded-[10px] focus:outline-none text-xs sm:text-base"
             />
           </div>
 
@@ -236,7 +236,7 @@ const Mail = memo(() => {
                     }
                   }}
                   placeholder="Enter CC email"
-                  className={`w-full sm:w-[400px] p-1 bg-transparent border ${
+                  className={`w-full p-[6px] sm:w-[400px] p-1 bg-transparent border ${
                     emailError ? "border-red-500" : "border-white"
                   } text-white placeholder-white placeholder-opacity-50 rounded-[10px] focus:outline-none text-xs sm:text-base`}
                 />
