@@ -7,8 +7,11 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import "../signup/signUp.css";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 const SignUp = () => {
-  const [isActive, setIsActive] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showconfirmPassword,setShowConfirmPassword] = useState(false)
+  const [isActive, setIsActive] = useState(false);
   const [isOtp, setIsOtp] = useState(
     JSON.parse(localStorage.getItem("isOtp")) || false
   );
@@ -24,13 +27,13 @@ const SignUp = () => {
     handleSubmit,
     reset,
     watch,
-    formState: { errors, isSubmitting},
+    formState: { errors, isSubmitting },
   } = useForm();
   const password = watch("password");
   const onSignUpSubmit = async (data) => {
     try {
       const { password, email, name, mobileNumber } = data;
-      
+
       const response = await axios.post("http://localhost:5000/api/signup", {
         name,
         email,
@@ -42,7 +45,7 @@ const SignUp = () => {
       localStorage.setItem("isOtp", JSON.stringify(true));
       localStorage.setItem("email", email);
       reset();
-      console.log(response.data.message)
+      console.log(response.data.message);
     } catch (error) {
       console.log("error while submitting", error);
     }
@@ -50,16 +53,19 @@ const SignUp = () => {
   const onOtpSubmit = async (data) => {
     const { otp } = data;
     try {
-      const response = await axios.post("http://localhost:5000/api/verifypasscode", {
-        email: storedEmail,
-        otp,
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/verifypasscode",
+        {
+          email: storedEmail,
+          otp,
+        }
+      );
       setIsOtp(false);
       localStorage.removeItem("isOtp");
       localStorage.removeItem("email");
       reset();
       setIsActive(false);
-      console.log(response.data.message)
+      console.log(response.data.message);
     } catch (error) {
       console.log("Error while verification", error);
     }
@@ -67,8 +73,13 @@ const SignUp = () => {
   const onLoginSubmit = async (data) => {
     const { email, password } = data;
     try {
-      const response = await axios.post("http://localhost:5000/api/login", { email, password });
-      console.log(response.data.message)
+      const response = await axios.post("http://localhost:5000/api/login", {
+        email,
+        password,
+      });
+      localStorage.setItem('sessionId', response.data.sessionId);
+      localStorage.setItem('token',response.data.token);
+      console.log(response.data.message);
       navigate("/sending-mail");
     } catch (error) {
       console.log("Error while login");
@@ -88,7 +99,7 @@ const SignUp = () => {
     gsap.set(loginRef.current, {
       backgroundColor: "#EE2922",
     });
-  }, []);
+  }, [isOtp]);
 
   useEffect(() => {
     if (isActive) {
@@ -159,9 +170,14 @@ const SignUp = () => {
           </p>
         </div>
         {isOtp ? (
-          <div className="h-[230px] w-full lg:w-[400px] border mt-10 xl:mt-0 rounded-lg shadow-md px-3">
+          <div className="h-[300px] w-full lg:w-[400px] border mt-10 xl:mt-0 rounded-lg shadow-md">
+            <button
+              className={`w-full bg-gradient-to-r from-black to-[#EE2922] text-white font-bold py-2 rounded-lg`}
+            >
+              Passcode
+            </button>
             <form
-              className="mt-4"
+              className="mt-4 px-3"
               ref={inputRef}
               onSubmit={handleSubmit(onOtpSubmit)}
             >
@@ -171,7 +187,7 @@ const SignUp = () => {
                   className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-6 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
                   placeholder="Email"
                   {...register("email")}
-                  onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
+                  onFocus={(e) => e.target.setAttribute("autocomplete", "off")}
                 />
               </div>
               <div className="mb-4">
@@ -191,12 +207,22 @@ const SignUp = () => {
                   VERIFY
                 </button>
               </div>
+              <div className="text-white font-light text-center text-[14px] mt-3">
+                <button
+                  className="underline"
+                  onClick={(e) => {
+                    setIsOtp(false);
+                  }}
+                >
+                  Sign up?
+                </button>
+              </div>
             </form>
           </div>
         ) : (
           <div
             className={`${
-              isActive ? "h-[490px]" : "h-[280px]"
+              isActive ? "h-[460px]" : "h-[280px]"
             } w-full lg:w-[400px] border mt-10 xl:mt-0 rounded-lg shadow-md px-3 py-2 mb-6`}
           >
             <div className="flex justify-between">
@@ -218,110 +244,186 @@ const SignUp = () => {
 
             {isActive ? (
               <form ref={inputRef} onSubmit={handleSubmit(onSignUpSubmit)}>
-                {/* Sign Up Form */}
-                <div className="mb-3">
-                  <input
-                    type="text"
-                    className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-8 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
-                    placeholder="Name"
-                    {...register("name", { required: "Name is required" })}
-                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
-                  />
-                </div>
-                <div className="mb-3">
-                  <input
-                    type="email"
-                    className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-8 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
-                    placeholder="Email"
-                    {...register("email", {
-                      required: "Email is required",
-                      pattern: {
-                        value:
-                          /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                      },
-                    })}
-                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
-                  />
-                </div>
-                <div className="mb-3">
-                  <input
-                    type="text"
-                    className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-8 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
-                    placeholder="Phone No."
-                    {...register("mobileNumber", {
-                      required: "Phone number is required",
-                    })}
-                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
-                  />
-                </div>
-                <div className="mb-3">
-                  <input
-                    type="password"
-                    className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-8 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
-                    placeholder="Password"
-                    {...register("password", {
-                      required: "Password is required",
-                      minLength: {
-                        value: 6,
-                      },
-                    })}
-                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
-                  />
-                </div>
-                <div className="mb-4">
-                  <input
-                    type="password"
-                    className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-8 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
-                    placeholder="Confirm Password"
-                    {...register("confirmPassword", {
-                      required: "Confirm Password is required",
-                      validate: (value) =>
-                        value === password || "Passwords do not match",
-                    })}
-                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
-                  />
-                  {errors.confirmPassword && (
-                    <p className="text-red-500 text-sm">
-                      {errors.confirmPassword.message}
-                    </p>
-                  )}
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-[#EE2922] text-white py-2 font-semibold rounded-lg hover:bg-red-600 transition"
+              {/* Name Input */}
+              <div className="mainDiv">
+                <input
+                  type="text"
+                  id="name"
+                  {...register("name", { required: "Name is required" })}
+                  className="input"
+                  placeholder="Name"
+                />
+                <label
+                  htmlFor="name"
+                  className="label"
                 >
-                  SIGN UP
-                </button>
-                <div className="text-white font-light text-center text-[14px] mt-3">
-                  <button className="underline" onClick={()=>{
-                    setIsOtp(true)
-                    }}>Have a passcode?</button>
+                  Name
+                </label>
+              </div>
+            
+              {/* Email Input */}
+              <div className="mainDiv">
+                <input
+                  type="email"
+                  id="email"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                    },
+                  })}
+                  className="input"
+                  placeholder="Email"
+                />
+                <label
+                  htmlFor="email"
+                  className="label"
+                >
+                  Email
+                </label>
+              </div>
+            
+              {/* Phone Input */}
+              <div className="mainDiv">
+                <input
+                  type="text"
+                  id="mobilenumber"
+                  {...register("mobileNumber", { required: "Mobile Number is required" })}
+                  className="input"
+                  placeholder="Phone No."
+                />
+                <label
+                  htmlFor="mobilenumber"
+                  className="label"
+                >
+                  Phone No.
+                </label>
+              </div>
+            
+              {/* Password Input */}
+              <div className="mainDiv">
+                <input
+                  type={showPassword? "text":"password"}
+                  id="password"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: { value: 6 },
+                  })}
+                  className="input"
+                  placeholder="Password"
+                />
+                <label
+                  htmlFor="password"
+                  className="label"
+                >
+                  Password
+                </label>
+                <div className="absolute right-3 top-1/2 translate-y-[-50%] text-gray-500 cursor-pointer" onClick={()=>{
+                  setShowPassword(!showPassword)
+                }}>
+                  {showPassword ? <FaEye/>: <FaEyeSlash/>}
                 </div>
-              </form>
+              </div>
+            
+              {/* Confirm Password Input */}
+              <div className="mainDiv">
+                <input
+                  type={showconfirmPassword? "text":"password"}
+                  id="confirmpassword"
+                  {...register("confirmPassword", {
+                    required: "Confirm Password is required",
+                    validate: (value) => value === password || "Passwords do not match",
+                  })}
+                  className="input"
+                  placeholder="Confirm Password"
+                />
+                <label
+                  htmlFor="confirmpassword"
+                  className="label"
+                >
+                  Confirm Password
+                </label>
+                <span className="absolute right-3 top-1/2 translate-y-[-50%] text-gray-500 cursor-pointer" onClick={()=>{
+                  setShowConfirmPassword(!showconfirmPassword)
+                }}>
+                  {showconfirmPassword ? <FaEye/>: <FaEyeSlash/>}
+                </span>
+                {errors.confirmPassword && (
+      <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
+    )}
+              </div>
+            
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-[#EE2922] text-white mt-3 py-2 font-semibold rounded-lg hover:bg-red-600 transition"
+              >
+                SIGN UP
+              </button>
+            
+              {/* Passcode Link */}
+              <div className="text-white font-light text-center text-[14px] mt-3">
+                <button
+                  className="underline"
+                  onClick={() => {
+                    setIsOtp(true);
+                  }}
+                >
+                  Have a passcode?
+                </button>
+              </div>
+            </form>
+            
             ) : (
               <form
                 className="mt-4"
                 ref={inputRef}
                 onSubmit={handleSubmit(onLoginSubmit)}
               >
-                <div className="mb-4">
-                  <input
-                    type="email"
-                    className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-6 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
-                    placeholder="Email"
-                    {...register("email")}
-                    onFocus={(e)=>e.target.setAttribute("autocomplete","off")}
-                  />
+                <div className="mainDiv">
+                <input
+                  type="email"
+                  id="email"
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                    },
+                  })}
+                  className="input"
+                  placeholder="Email"
+                />
+                <label
+                  htmlFor="email"
+                  className="label"
+                >
+                  Email
+                </label>
+              </div>
+              <div className="mainDiv">
+                <input
+                  type={showPassword? "text":"password"}
+                  id="password"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: { value: 6 },
+                  })}
+                  className="input"
+                  placeholder="Password"
+                />
+                <label
+                  htmlFor="password"
+                  className="label"
+                >
+                  Password
+                </label>
+                <div className="absolute right-3 top-1/2 translate-y-[-50%] text-gray-500 cursor-pointer" onClick={()=>{
+                  setShowPassword(!showPassword)
+                }}>
+                  {showPassword ? <FaEye/>: <FaEyeSlash/>}
                 </div>
-                <div className="mb-4">
-                  <input
-                    type="password"
-                    className="name w-full border-0 border-b-2 border-gray-400 bg-transparent text-white pt-6 placeholder-gray-400 focus:outline-none focus:ring-0 focus:border-[#EE2922] focus:placeholder-opacity-0"
-                    placeholder="Password"
-                    {...register("password")}
-                  />
-                </div>
+              </div>
                 <div className="flex justify-center">
                   <button
                     type="submit"
