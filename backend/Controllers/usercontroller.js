@@ -173,7 +173,7 @@ const verifyUser = async (req, res) => {
   const sendMailController = async (req, res) => {
     try {
       console.log("🚀 Inside sendMailController");
-      console.log("📩 req.body:", req.body);
+      console.log("📩 req.data-", req.data);
       console.log("📂 req.files:", req.files);
   
       // Ensure correct extraction from req.body
@@ -199,7 +199,7 @@ const verifyUser = async (req, res) => {
       console.log("📩 Email:", email);
       console.log("📩 CC:", ccArray);
       console.log("📩 Subject:", subject);
-      console.log("📩 Content:", content);
+      // console.log("📩 Content:", content);
       console.log("📂 File:", file);
   
       // Check if email exists before proceeding

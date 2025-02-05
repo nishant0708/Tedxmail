@@ -13,13 +13,8 @@ router.post("/signup", signUp);
 router.post("/verifypasscode", verifyUser );
 
 // ✅ Ensure file uploads are handled properly
-router.post(
-    "/sending-mail",
-    upload.fields([{ name: "file", maxCount: 1 }]), // ✅ Allows both file & text fields
-    sendMailController
-  );  
+router.post( "/sending-mail", sendMailController);  
 
-  
 
 // only for testing file upload and it works too
 
