@@ -208,7 +208,6 @@ const verifyUser = async (req, res) => {
     }
   };
 
-
   const sendMailController = async (req, res) => {
     console.log("🚀 Request Headers:", req.headers);
     console.log("🚀 Request Body:", req.body); 

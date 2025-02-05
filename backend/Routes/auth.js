@@ -13,7 +13,7 @@ const upload = multer({ storage: storage });
 router.post("/login", login);
 router.post("/signup", signUp);
 router.post("/verifypasscode", verifyUser );
-router.post("/verifysession", verifySession );
+router.post("/verifysession",verifySession)
 
 // ✅ Ensure file uploads are handled properly
 router.post("/send-email", upload.any("name"), sendMailController);
