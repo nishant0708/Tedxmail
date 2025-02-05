@@ -170,6 +170,44 @@ const verifyUser = async (req, res) => {
     }
   };
 
+  const verifySession = async (req, res) => {
+    const { sessionId } = req.body;
+  
+    try {
+      // Find a user with the matching session ID
+      const user = await User.findOne({ "sessions.sessionId": sessionId });
+  
+      if (!user) {
+        return res.status(401).json({ valid: false, error: "Session not found" });
+      }
+  
+      // Find the specific session
+      const session = user.sessions.find((s) => s.sessionId === sessionId);
+  
+      // Check if session has expired
+      if (new Date() > session.expiresAt) {
+        // Optional: Remove expired session from user's sessions array
+        user.sessions = user.sessions.filter((s) => s.sessionId !== sessionId);
+        await user.save();
+  
+        return res.status(401).json({ valid: false, error: "Session expired" });
+      }
+  
+      // If session is valid, return success
+      res.status(200).json({ 
+        valid: true, 
+        user: {
+          id: user._id,
+          email: user.email,
+          name: user.name
+        }
+      });
+    } catch (error) {
+      console.error("Error in verifying session:", error);
+      res.status(500).json({ error: "Server error" });
+    }
+  };
+
   const sendMailController = async (req, res) => {
     console.log("🚀 Request Headers:", req.headers);
     console.log("🚀 Request Body:", req.body); 
@@ -203,5 +241,6 @@ module.exports = {
   signUp,
   verifyUser,
   login,
+  verifySession,
   sendMailController
 };
