@@ -1,9 +1,60 @@
-.name::placeholder {
-    transition: all 0.3s ease;
+.mainDiv {
+    position: relative;
+    padding: 15px 0 0;
+    margin-top: 8px;
+    width: 100%;
   }
-
-.name:focus::placeholder {
-    transform: translateY(-20px);
+  
+  .input {
+    font-family: inherit;
+    width: 100%;
+    border: 0;
+    border-bottom: 2px solid #9b9b9b; 
+    outline: 0;
+    color: #fff;
+    padding: 7px 0;
+    background: transparent;
+    transition: font-size 0.2s, color 0.2s;
+  }
+  
+  
+  .input::placeholder {
+    color: transparent;
+  }
+  
+  
+  .input:focus ~ .label,
+  .input:not(:placeholder-shown) ~ .label {
+    top: 0;
     font-size: 0.8rem;
-    color: #EE2922; 
+    color: #EE2922;
+  }
+  
+  
+  .label {
+    position: absolute;
+    top: 20px;
+    left: 0;
+    display: block;
+    transition: 0.2s;
+    color: #9b9b9b; 
+  }
+  
+
+  
+
+  .input:required,
+  .input:invalid {
+    box-shadow: none;
+  }
+  
+
+  .eye-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #9b9b9b;
+    transition: color 0.2s;
   }
