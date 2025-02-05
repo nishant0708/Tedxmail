@@ -1,7 +1,7 @@
 import React, { useState, memo, useEffect } from "react";
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
 import { storage } from "../../firebase/config";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL, listAll } from "firebase/storage";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { auto } from "@cloudinary/url-gen/actions/resize";
 import { autoGravity } from "@cloudinary/url-gen/qualifiers/gravity";
@@ -36,31 +36,79 @@ const Mail = memo(() => {
     .format("auto")
     .quality("auto");
 
-  const uploadToFirebase = async (file) => {
-    if (!file) return null;
 
-    const storageRef = ref(storage, `emails/${Date.now()}-${file.name}`);
-    const uploadTask = uploadBytesResumable(storageRef, file);
 
-    return new Promise((resolve, reject) => {
-      uploadTask.on(
-        "state_changed",
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(progress);
-        },
-        (error) => {
-          console.error("Upload error:", error);
-          reject(error);
-        },
-        async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          setFileURL(downloadURL);
-          resolve(downloadURL);
+    const checkFileExists = async (fileName) => {
+      try {
+        // Reference to the emails folder
+        const folderRef = ref(storage, 'emails');
+        
+        // List all files in the folder
+        const filesList = await listAll(folderRef);
+        
+        // Find a file with matching name
+        for (const fileRef of filesList.items) {
+          // Remove the timestamp prefix from stored files to match with new filename
+          const storedFileName = fileRef.name.split('-').slice(1).join('-');
+          
+          if (storedFileName === fileName) {
+            // If match found, get and return its URL
+            const url = await getDownloadURL(fileRef);
+            return { exists: true, url };
+          }
         }
-      );
-    });
-  };
+        
+        return { exists: false };
+      } catch (error) {
+        console.error("Error checking file existence:", error);
+        return { exists: false };
+      }
+    };
+    
+
+    const uploadToFirebase = async (file) => {
+      if (!file) return null;
+    
+      try {
+        // Check if file with same name exists
+        const { exists, url } = await checkFileExists(file.name);
+        
+        if (exists) {
+          console.log("File already exists, returning existing URL");
+          // Return existing file URL without uploading
+          setFileURL(url);
+          setUploadProgress(100);
+          return url;
+        }
+    
+        // If file doesn't exist, proceed with upload
+        const storageRef = ref(storage, `emails/${Date.now()}-${file.name}`);
+        const uploadTask = uploadBytesResumable(storageRef, file);
+    
+        return new Promise((resolve, reject) => {
+          uploadTask.on(
+            "state_changed",
+            (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              setUploadProgress(progress);
+            },
+            (error) => {
+              console.error("Upload error:", error);
+              reject(error);
+            },
+            async () => {
+              const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+              setFileURL(downloadURL);
+              resolve(downloadURL);
+            }
+          );
+        });
+      } catch (error) {
+        console.error("Error in uploadToFirebase:", error);
+        throw error;
+      }
+    };
+    
 
   const addEmail = () => {
     if (ccEmail.trim() !== "") {

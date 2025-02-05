@@ -33,49 +33,42 @@ exports.sendOtpToEmail = async (email, otp, text) => {
 // Function to send mail
 
 
-exports.sendEmail = async (items) => {
+exports.sendEmail = async ({ email, ccArray, subject, content, attachmentURL }) => {
   try {
-    console.log("sendEmail() called with:", items);
-
-    const { email, ccArray, subject, content, file } = items;
-
-    if (!email) {
-      throw new Error("No recipient email provided");
-    }
-
-    // Fetch and attach files as buffers
-    const attachments = await Promise.all(
-      file.map(async (f) => {
-        const response = await fetch(f.path);
-        const buffer = await response.buffer();
-        return {
-          filename: f.originalname,
-          content: buffer,
-          encoding: "base64",
-        };
-      })
-    );
-
+    // Configure email options
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.EMAIL_FROM,
       to: email,
-      cc: ccArray,
-      subject: subject || "No Subject",
-      html: content || "",
-      attachments,
+      subject: subject,
+      html: content,
+      cc: ccArray
     };
 
-    console.log("✉️ Mail Options:", mailOptions);
+    // Add attachment if URL exists
+    if (attachmentURL) {
+      mailOptions.attachments = [{
+        // Generate a filename from the URL
+        filename: `attachment-${Date.now()}${getFileExtension(attachmentURL)}`,
+        path: attachmentURL
+      }];
+    }
 
+    // Send the email
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Mail sent successfully:", info.response);
     return info;
+
   } catch (error) {
-    console.error("❌ Error sending email:", error);
-    throw new Error(`Failed to send email: ${error.message}`);
+    console.error("Error in sendEmail:", error);
+    throw error;
   }
 };
 
+// Helper function to get file extension from URL
+const getFileExtension = (url) => {
+  // Extract file extension from the URL or default to .pdf
+  const match = url.match(/\.([^.]+)$/);
+  return match ? match[0] : '.pdf';
+};
 
 
 

@@ -173,49 +173,65 @@ const verifyUser = async (req, res) => {
   const sendMailController = async (req, res) => {
     try {
       console.log("🚀 Inside sendMailController");
-      console.log("📩 req.data-", req.data);
+      console.log("📩 req.body:", req.body);
       console.log("📂 req.files:", req.files);
   
-      // Ensure correct extraction from req.body
-      const email = req.body.email;
-      const subject = req.body.subject;
-      const content = req.body.content;
+      // Extract data from req.body
+      const {
+        email,
+        subject,
+        content,
+        cc,
+        attachmentURL  // New: get the Firebase URL
+      } = req.body;
   
-      // Ensure ccArray is parsed correctly (it may be a string)
-      let ccArray = req.body.ccArray;
-      if (typeof ccArray === "string") {
-        try {
-          ccArray = JSON.parse(ccArray);
-        } catch (error) {
-          console.error("⚠️ Error parsing ccArray:", error);
-          ccArray = [];
-        }
+      // Parse CC emails from the comma-separated string
+      let ccArray = [];
+      if (cc) {
+        ccArray = cc.split(',').filter(email => email.trim());
       }
-  
-      // Ensure req.files exists and file data is extracted properly
-      const file = req.files?.file || [];
   
       console.log("✅ Extracted Data:");
       console.log("📩 Email:", email);
       console.log("📩 CC:", ccArray);
       console.log("📩 Subject:", subject);
+      console.log("📩 Attachment URL:", attachmentURL);
       // console.log("📩 Content:", content);
-      console.log("📂 File:", file);
   
-      // Check if email exists before proceeding
+      // Validate required fields
       if (!email) {
-        return res.status(400).json({ success: false, message: "Recipient email is required" });
+        return res.status(400).json({ 
+          success: false, 
+          message: "Recipient email is required" 
+        });
       }
   
-      // Call sendEmail function with correctly extracted data
-      const response = await sendEmail({ email, ccArray, subject, content, file });
+      // Call sendEmail function with the extracted data
+      const response = await sendEmail({ 
+        email, 
+        ccArray, 
+        subject, 
+        content, 
+        attachmentURL  // Pass the Firebase URL instead of file
+      });
   
-      return res.status(200).json({ success: true, message: "Email sent successfully", response });
+      return res.status(200).json({ 
+        success: true, 
+        message: "Email sent successfully", 
+        response 
+      });
+  
     } catch (error) {
       console.error("❌ Error in sendMailController:", error);
-      return res.status(500).json({ success: false, message: "Internal Server Error", error: error.message });
+      return res.status(500).json({ 
+        success: false, 
+        message: "Internal Server Error", 
+        error: error.message 
+      });
     }
   };
+  
+  module.exports = sendMailController;
   
   
   
